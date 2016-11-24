@@ -34,6 +34,7 @@ def read_region(path, region, start_year, end_year):
 
 
 
+# testing, 1, 2, 3
 
 region_data = read_region("iso_data/", 'ME', start_year=2003, end_year=2016)
 #region_data = np.load('data/ME.npy')
