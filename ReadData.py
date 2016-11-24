@@ -4,6 +4,15 @@ import matplotlib.pyplot as plt
 
 
 def filter_zero_values(energy_array):
+	"""
+	filter small values from the energy array
+
+	args:
+		- energy_array: numpy array containing energy data for days and times
+	returns:
+		- energy_array: modified from original version to interpolate 0 values
+	"""
+
 	# assumes that energy values are in the  third column
 	row_num = 0
 	for rows in energy_array:
@@ -17,6 +26,15 @@ def filter_zero_values(energy_array):
 def read_region(path, region, start_year, end_year):
 	"""
 	open and read an excel file
+
+	args:
+		- path: data path of region data
+		- region: string containing region abbreviation
+		- start_year: what year to start reading data
+		- end_year: what year to stop reading data
+
+	returns:
+		- region_data_total: concatenated version of data for all years of region specified
 	"""
 	region_data_total = np.ndarray((1,3))
 
@@ -53,6 +71,29 @@ def compare_05_06():
 	plt.plot(x, data_06[:, 2], 'b')
 	plt.show()
 
+def split_data(energy_array, train=0.6, val=0.2, test=0.2):
+	"""
+	splits data into training, validation, and test sets
+
+	args:
+		- energy_array: array containing the data
+		- train, val, test: how much of data to put into each set (must add to 1)
+
+	returns:
+		- energy_train: training data
+		- energy_val: validation data
+		- energy_test: test data
+	"""
+	end_dex_train = np.floor(energy_array.shape[0] * train)
+	start_dex_val = end_dex_train + 1
+	end_dex_val = np.floor(energy_array.shape[0] * (train + val))
+	start_dex_test = end_dex_val + 1
+
+	energy_train = energy[0:end_dex_train, :]
+	energy_val = energy[start_dex_val:end_dex_val, :]
+	energy_test = energy[start_dex_test:, :]
+
+	return energy_train, energy_val, energy_test
 
 
 #region_data = read_region("iso_data/", 'ME', start_year=2003, end_year=2016)
@@ -64,4 +105,4 @@ plt.plot(x,y)
 plt.show()
 
 # compare data from 05 and 06
-compare_05_06()
+# compare_05_06()
