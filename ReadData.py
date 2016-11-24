@@ -47,10 +47,9 @@ def read_region(path, region, start_year, end_year):
 def compare_05_06():
 	data_05 = read_region("iso_data/", "ME", start_year=2005, end_year=2005)
 	data_06 = read_region("iso_data/", "ME", start_year=2006, end_year=2006)
-	x_range = data_05.shape[0]
 	x = np.arange(0, data_05.shape[0])
-	plt.plot(x, data_05, 'r')
-	plt.plot(x, data_06, 'b')
+	plt.plot(x, data_05[:, 2], 'r')
+	plt.plot(x, data_06[:, 2], 'b')
 	plt.show()
 
 
@@ -60,8 +59,8 @@ region_data = np.load('data/ME.npy')
 
 x = np.arange(0, region_data.shape[0])
 y = region_data[:, 2]
-plt.plot(x,y)
-plt.show()
+# plt.plot(x,y)
+# plt.show()
 
 # compare data from 05 and 06
 compare_05_06()
