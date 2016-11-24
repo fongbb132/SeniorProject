@@ -8,7 +8,8 @@ def filter_zero_values(energy_array):
 	row_num = 0
 	for rows in energy_array:
 		if rows[2] < 100:
-			energy_array[row_num, 2] = (1/2) * (energy_array[row_num - 1, 2] + energy_array[row_num + 1, 2])
+			new_val = energy_array[row_num - 1, 2] + energy_array[row_num + 1, 2]
+			energy_array[row_num, 2] = new_val * 0.5
 		row_num += 1
 
 	return energy_array
@@ -59,8 +60,8 @@ region_data = np.load('data/ME.npy')
 
 x = np.arange(0, region_data.shape[0])
 y = region_data[:, 2]
-# plt.plot(x,y)
-# plt.show()
+plt.plot(x,y)
+plt.show()
 
 # compare data from 05 and 06
 compare_05_06()
