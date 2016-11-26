@@ -95,6 +95,82 @@ def split_data(energy_array, train=0.6, val=0.2, test=0.2):
 
 	return energy_train, energy_val, energy_test
 
+def create_batches(encoder_insize=24*4*30, decoder_insize=24*1*30, batch_num=1, energy_data):
+	"""
+	XXXXX VOID FUNCTION XXXXX
+
+	"""
+
+	# split data into [num_batches x batch_len]
+	data_len = energy_data.shape[0]
+	energy_data = tf.convert_to_tensor(energy_data, name="energy_data_raw", dtype=tf.float32)
+	batch_len = data_len // batch_num  # number of data points / batch
+	energy_data_batch_form = tf.reshape(energy_data[0 : batch_num * batch_len], [batch_size, batch_len])
+
+	# make a list of tensors of size decoder_input_size + encoder_input_size
+	enc_plus_dec_in_list = tf.split(1, encoder_insize + decoder_insize, energy_data_batch_form)
+
+
+def create_lists_of_data(energy_data, encoder_insize=24*4*30, decoder_insize=24*1*30):
+	"""
+	creates lists of data, where each array in the list contains the joint encoder and decoder
+	data necessary for further computations
+
+	args:
+		- energy_data: a numpy array of data with columns [day time energy_load]
+		- encoder_insize: how many inputs for encoder, by default it is 4 months
+		- decoder_insize: how many inputs for decoder, by default it is 1 month
+
+	returns:
+		- enc_dec_list: a list where each entry contains input data for one encode/decode cycle
+	"""
+
+	# create variables to store how many data points one entyr contains, and how many 
+	# entries in the list there are
+	data_len = energy_data.shape[0]
+	list_entry_size = encoder_insize + decoder_insize
+	num_list_entries = data_len // list_entry_size
+
+	# remove data off the end of the list
+	energy_data = tf.convert_to_tensor(energy_data, name="energy_data_raw", dtype=tf.float32)
+	energy_data = energy_data[0 : num_list_entries * list_entry_size]
+
+	# create a list where each entry contains the data for one encoder/decoder cycle
+	enc_dec_list = tf.split(0, list_entry_size, energy_data)
+
+	return enc_dec_list
+
+def seperate_enc_dec(enc_dec_data, encoder_insize=24*4*30, decoder_insize=24*1*30):
+	"""
+	given a tensor of combined encoder decoder inputs, split them apart into two seperate
+	lists so that they may be processed later on
+
+	additionally, the decoder list is properly seperated so that a targets list may also be created
+
+	args:
+		- enc_dec_data: a tensor containing data for one encoder decoder cycle
+		- encoder_insize: how many inputs for encoder, by default it is 4 months
+		- decoder_insize: how many inputs for decoder, by default it is 1 month
+
+	returns:
+		- enc_list: a list containing sequentially the encoder inputs
+		- dec_list: a list containing sequentially the decoder inputs
+		- target_list: a list containing sequally the targets corresponding to dec_list
+
+
+
+	"""
+	enc_data = enc_dec_data[0 : encoder_insize]
+	dec_target_data = enc_dec_data[encoder_insize : ]
+	dec_data = dec_target_data[:, 0 : 3]
+	target_data = dec_target_data[:, 3]
+
+	enc_list = tf.split(0, 1, enc_data)
+	dec_list = tf.split(0, 1, dec_data)
+	target_list = tf.split(0, 1, target_data)
+
+	return enc_list, dec_list, target_list
+
 
 #region_data = read_region("iso_data/", 'ME', start_year=2003, end_year=2016)
 region_data = np.load('data/ME.npy')
